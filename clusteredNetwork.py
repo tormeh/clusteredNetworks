@@ -297,9 +297,10 @@ def writeSpikesToFile(spike_mons, rEE, duration):
     return True
     
 def getGoodPath(rEE, duration):
-    filenameRoot = "uniformNet_"
+    filenameRoot = "clusteredNet_"
     filenameRoot = filenameRoot + ("rEE" + str(rEE) + "_")
     filenameRoot = filenameRoot + ("duration" + str(duration) + "_")
+    filenameRoot = filenameRoot + ("numOfNeurons" + str(N_e + N_i) + "_")
     home = expanduser("~")
     path = home + "/Documents/MNSprojectResults/"
     i = 0
