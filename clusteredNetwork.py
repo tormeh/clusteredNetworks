@@ -79,7 +79,7 @@ if uniformClustering:
 print "pEEin = ", pEEin, "pEEout = ", pEEout    
     
 # Duration of our simulation
-duration = 100*ms
+duration = 5000*ms
 
 # Let's create an equation object from our string and parameters
 model_eqs_e = Equations(eqs_string,
@@ -298,9 +298,9 @@ def writeSpikesToFile(spike_mons, rEE, duration):
     
 def getGoodPath(rEE, duration):
     filenameRoot = "clusteredNet_"
-    filenameRoot = filenameRoot + ("rEE" + str(rEE) + "_")
-    filenameRoot = filenameRoot + ("duration" + str(duration) + "_")
-    filenameRoot = filenameRoot + ("numOfNeurons" + str(N_e + N_i) + "_")
+    filenameRoot = filenameRoot + ("rEE:" + str(float(rEE)) + "_")
+    filenameRoot = filenameRoot + ("duration:" + str(float(duration)) + "_")
+    filenameRoot = filenameRoot + ("numOfNeurons:" + str(int(N_e + N_i)) + "_")
     home = expanduser("~")
     path = home + "/Documents/MNSprojectResults/"
     i = 0
