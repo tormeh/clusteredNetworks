@@ -1,0 +1,42 @@
+\documentclass[11pt]{article}
+
+\begin{document}
+
+\title{Project 8: Slow Dynamics and High Variability in Networks with Clustered Connections}
+\author{Kirill Shchegelskiy and Tormod Hellen}
+
+\maketitle
+
+\section{Introduction}
+
+Many real-world networks exhibit nonuniform connectivity structures, often including clustering of connections between different units. For instance, anatomical studies demonstrate that excitatory connections in cortex are not uniformly distributed, but the neurons are clustered into groups of highly connected neurons. However, most of network simulations use simple uniform connection structures and thus lack the architecture complexity.
+
+In this project we after the Litwin-Kumar and Doiron (2012) studied the effect of clustered excitatory connections on the dynamics of neuronal networks. As it was demonstrated before, our results show that even small perturbations from homogeneously connected structures can substantially change network dynamics. 
+
+\section{Results}
+
+Our network consisted of 4,000 excitatory (E) and 1,000 inhibitory (I) model neurons. Connections involving inhibitory neurons were nonspecific, randomly distributed with probability $p^{EI} = p^{IE} = p^{II} = 0.5$, where $p^{XY}$ denotes the probability of a connection from a neuron in population $Y$ to a neuron in population $X$. Connections between excitatory neurons occured with probability $p^{EE} = 0.2$.
+
+%1. uniform network raster plot with white noise
+
+We began by replicating the asyncronous dynamics of uniform (non-clustered) balanced networks.
+
+%2. clustered network raster plot
+
+%3. fano factors for uniform and clustered networks
+
+%4. raster plots for different $R^{EE}$; fano factor over $R^{EE}$
+
+%5. fano factor over time
+
+\section{Discussion}
+
+We have shown that clustering of excitatory connections substantially changes balanced network dynamics. Small changes in neurons connectivity led to slow firing rate fluctuations in spontaneous conditions. These stochastic dynamics reflect large trial-to-trial variability in network responses and are not presented in simple uniform structures.
+
+The network connectivity in this study was motivated by the anatomical evidence for clustering of connections between pyramidal neurons in cortex. The resulting dynamics of the artificial clustered network are reminiscent of persistent state activity and thus are closer to experimental data than the uniform ones.
+
+Our parameter and model choices were based on the Litwin-Kumar and Doiron (2012) and our results were quite close to the ones demonstrated in the referred article. The critical value for $R^{EE}$ (neuronal clustering control value) was around $2.5$, and that is very close to the result demonstrated by Litwin-Kumar and Doiron. The Fano factors for uniform and clustered network were ??? - need more info here!!!
+
+
+
+\end{document}
