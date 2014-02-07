@@ -11,4 +11,4 @@ for (i <- 0.0 until inter by inter/rep)
 }*/
 
 
-(3.45 until 4.2 by 0.1).par.map(rEE => run(rEE))
+(2.5 until 4.0 by 0.015).par.map(rEE => run(rEE))
