@@ -7,6 +7,9 @@ import matplotlib.pylab as pylab
 import sys
 import os
 from os.path import expanduser
+import time
+import random
+import string
 
 from brian import Network, Equations, NeuronGroup, Connection,\
     SpikeMonitor, raster_plot, StateMonitor, clear, reinit
@@ -37,15 +40,18 @@ eqs_string = ''' dV/dt = (1.0/tau)*(myu-V) + Isyn : 1
              '''
 
 # Our model parameters
-taue = 15.*ms # time constant of membrane excitatory
-taui = 10.*ms # time constant of membrane inhibitory
-tau1 = 1.*ms
-tau2e = 3.*ms
-tau2i = 2.*ms
-myueMax = 1.2
-myueMin = 1.1
-myuiMax = 1.05
-myuiMin = 1.0
+mod = 0.83
+mod2 = 0.96
+
+taue = 15.*ms *mod # time constant of membrane excitatory
+taui = 10.*ms *mod # time constant of membrane inhibitory
+tau1 = 1.*ms *mod
+tau2e = 3.*ms *mod
+tau2i = 2.*ms *mod
+myueMax = 1.2 *mod2
+myueMin = 1.1 *mod2
+myuiMax = 1.05 *mod2
+myuiMin = 1.0 *mod2
 syn_delay = 0*ms # synaptic delay between two neurons
 V_th = 1 # firing threshold
 V_reset = 0 # reset potential
@@ -79,7 +85,7 @@ if uniformClustering:
 print "pEEin = ", pEEin, "pEEout = ", pEEout    
     
 # Duration of our simulation
-duration = 5000*ms
+duration = 1000*ms
 
 # Let's create an equation object from our string and parameters
 model_eqs_e = Equations(eqs_string,
@@ -289,13 +295,24 @@ for irun in range(1,6):
 
 def writeSpikesToFile(spike_mons, rEE, duration):
     path = getGoodPath(rEE, duration)
+    sl = []
+    for spike_mon in spike_mons:
+      sl.append(str(spike_mon.spikes))
     with open(path, 'w') as f:
-        for spike_mon in spike_mons:
-            f.write(str(spike_mon.spikes))
+        for s in sl:
+            f.write(s)
             f.write("\n")
     assert(f.closed)
     return True
-    
+
+def buildListString(l):
+  print("1")
+  s = "["
+  print("2")
+  s.join(string.joinfields(map(lambda x: str(x)+"," , l)))
+  print("3")
+  return s[:-1] + "]"
+
 def getGoodPath(rEE, duration):
     filenameRoot = "clusteredNet_"
     filenameRoot = filenameRoot + ("rEE:" + str(float(rEE)) + "_")

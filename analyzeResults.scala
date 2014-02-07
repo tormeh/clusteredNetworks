@@ -10,7 +10,6 @@ val files = directory.listFiles
 //this next one is really ugly, so let's get some type checking so we know what we're dealing with.
 val results = files.par.map(file => readFromFile(file.toString())).toList: List[(List[(Double, Double)], List[(Double, Double)], Double, Double, Int)]
 
-
 def readFromFile(fileStr: String): (List[(Double, Double)], List[(Double, Double)], Double, Double, Int) = 
 {
   val localFileName = fileStr.split("/").last
@@ -43,8 +42,13 @@ def readFromFile(fileStr: String): (List[(Double, Double)], List[(Double, Double
 }
 
 val timeChunk = 0.1
-val fanofactors = results.map(res => averageFanoFactor((res._1, res._2), timeChunk, res._4, res._5))
-println(fanofactors)
+
+val fanofactors = results.map(res => averageFanoFactor((res._1, res._2), res._3, timeChunk, res._4, res._5))
+val sortedFanofactors = fanofactors.sortWith((x, y) => x._1 < y._1)
+println(sortedFanofactors)
+
+/*val res = results.last
+val fanofactors = averageFanoFactor((res._1, res._2), res._3, timeChunk, res._4, res._5)*/
 
 def fanofactorsForSingleSpikeTrain(spiketrain: List[(Double, Double)], timeChunk: Double, duration: Double, numOfNeurons: Int): List[Double] =
 {
@@ -53,6 +57,10 @@ def fanofactorsForSingleSpikeTrain(spiketrain: List[(Double, Double)], timeChunk
   {
     neuronspikes((spike._1).toInt) += (spike._2).toDouble
   }
+  /*for (i <- 0 until neuronspikes.length)
+  {
+    println(i.toString + neuronspikes(i).toString)
+  }*/
   val factors = neuronspikes.par.map(neuron => fanofactorOfNeuron(neuron.toList, timeChunk, duration)).toList
   return factors.toList
 }
@@ -84,12 +92,16 @@ def fanofactorOfNeuron(spikeTimesForNeuron: List[Double], timeChunkSize: Double,
 
 def fanofactors(spiketrains: (List[(Double, Double)], List[(Double, Double)]), timeChunk: Double, duration: Double, numOfNeurons: Int): List[Double] =
 {
-  val factors = fanofactorsForSingleSpikeTrain(spiketrains._1, timeChunk, duration, numOfNeurons) ++ fanofactorsForSingleSpikeTrain(spiketrains._2, timeChunk, duration, numOfNeurons)
+  val factors = fanofactorsForSingleSpikeTrain(spiketrains._1, timeChunk, duration, numOfNeurons/5*4) ++ fanofactorsForSingleSpikeTrain(spiketrains._2, timeChunk, duration, numOfNeurons/5*1)
+  /*println("")
+  println(factors.toString)
+  println("")*/
   return factors.toList
 }
 
-def averageFanoFactor(spiketrains: (List[(Double, Double)], List[(Double, Double)]), timeChunk: Double, duration: Double, numOfNeurons: Int): Double =
+def averageFanoFactor(spiketrains: (List[(Double, Double)], List[(Double, Double)]), rEE: Double, timeChunk: Double, duration: Double, numOfNeurons: Int): (Double, Double) =
 {
   val fanoFactorForNeurons = fanofactors(spiketrains, timeChunk, duration, numOfNeurons)
-  return fanoFactorForNeurons.sum/fanoFactorForNeurons.length
+  val averageFanofactor = fanoFactorForNeurons.sum/fanoFactorForNeurons.length
+  return (rEE, averageFanofactor)
 }
