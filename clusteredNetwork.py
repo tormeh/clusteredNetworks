@@ -7,6 +7,10 @@ import matplotlib.pylab as pylab
 import sys
 import os
 from os.path import expanduser
+import time
+import random
+import string
+import struct
 
 from brian import Network, Equations, NeuronGroup, Connection,\
     SpikeMonitor, raster_plot, StateMonitor, clear, reinit
@@ -37,15 +41,18 @@ eqs_string = ''' dV/dt = (1.0/tau)*(myu-V) + Isyn : 1
              '''
 
 # Our model parameters
-taue = 15.*ms # time constant of membrane excitatory
-taui = 10.*ms # time constant of membrane inhibitory
-tau1 = 1.*ms
-tau2e = 3.*ms
-tau2i = 2.*ms
-myueMax = 1.2
-myueMin = 1.1
-myuiMax = 1.05
-myuiMin = 1.0
+mod = 0.83
+mod2 = 0.96
+
+taue = 15.*ms *mod # time constant of membrane excitatory
+taui = 10.*ms *mod # time constant of membrane inhibitory
+tau1 = 1.*ms *mod
+tau2e = 3.*ms *mod
+tau2i = 2.*ms *mod
+myueMax = 1.2 *mod2
+myueMin = 1.1 *mod2
+myuiMax = 1.05 *mod2
+myuiMin = 1.0 *mod2
 syn_delay = 0*ms # synaptic delay between two neurons
 V_th = 1 # firing threshold
 V_reset = 0 # reset potential
@@ -288,21 +295,57 @@ for irun in range(1,6):
 #plt.show()
 
 def writeSpikesToFile(spike_mons, rEE, duration):
-    path = getGoodPath(rEE, duration)
+    length = 0
+    for spike_mon in spike_mons:
+      length = length + len(spike_mon.spikes)
+    
+    path = getGoodPath(rEE, duration, N_e, N_i, length)
+    sl = []
+    for spike_mon in spike_mons:
+      sl.append(str(spike_mon.spikes))
     with open(path, 'w') as f:
-        for spike_mon in spike_mons:
-            f.write(str(spike_mon.spikes))
+        for s in sl:
+            f.write(s)
             f.write("\n")
     assert(f.closed)
     return True
-    
-def getGoodPath(rEE, duration):
+
+def bWriteSpikesToFile(spike_mons, rEE, duration):
+  length = 0
+  for spike_mon in spike_mons:
+    length = length + len(spike_mon.spikes)
+  
+  path = getGoodPath(rEE, duration, N_e, N_i, length)
+  with open(path, 'wb') as f:
+    for i in range(len(spike_mons)):
+      for spike in spike_mons[i].spikes:
+        if i == 0:
+          f.write(struct.pack('>i', int(spike[0])))
+          f.write(struct.pack('>d', float(spike[1])))
+        elif i == 1:
+          f.write(struct.pack('>i', int(spike[0]+N_e)))
+          f.write(struct.pack('>d', float(spike[1])))
+        else:
+          print("ERROR")
+  return True
+
+def buildListString(l):
+  print("1")
+  s = "["
+  print("2")
+  s.join(string.joinfields(map(lambda x: str(x)+"," , l)))
+  print("3")
+  return s[:-1] + "]"
+
+def getGoodPath(rEE, duration, N_e, N_i, length):
     filenameRoot = "clusteredNet_"
     filenameRoot = filenameRoot + ("rEE:" + str(float(rEE)) + "_")
     filenameRoot = filenameRoot + ("duration:" + str(float(duration)) + "_")
-    filenameRoot = filenameRoot + ("numOfNeurons:" + str(int(N_e + N_i)) + "_")
+    filenameRoot = filenameRoot + ("Ne:" + str(int(N_e)) + "_")
+    filenameRoot = filenameRoot + ("Ni:" + str(int(N_i)) + "_")
+    filenameRoot = filenameRoot + ("len:" + str(length) + "_")
     home = expanduser("~")
-    path = home + "/Documents/MNSprojectResults/"
+    path = home + "/Documents/MNSprojectResults/b/"
     i = 0
     available = not os.path.exists(path+filenameRoot+"("+str(i)+")")
     while (not available):
@@ -310,4 +353,4 @@ def getGoodPath(rEE, duration):
         available = not os.path.exists(path+filenameRoot+"("+str(i)+")")
     return path + filenameRoot + "(" + str(i) + ")"
 
-writeSpikesToFile([spike_mon_e, spike_mon_i], rEE, duration)
+bWriteSpikesToFile([spike_mon_e, spike_mon_i], rEE, duration)
